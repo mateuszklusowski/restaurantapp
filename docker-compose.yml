@@ -11,4 +11,37 @@ services:
     volumes:
       - ./app:/app
     command: >
-      sh -c "python3 manage.py runserver 0.0.0.0:8000"
+      sh -c "python3 manage.py wait_for_db &&
+             python3 manage.py runserver 0.0.0.0:8000"
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DEBUG=${DEBUG}
+      - CACHE_LOCATION=${CACHE_LOCATION}
+      - SECRET_KEY=${SECRET_KEY}
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14.5-alpine
+    volumes:
+      - dev-db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+  redis:
+    image: redis:7.0.4-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - dev-redis-data:/data
+    depends_on:
+      - db
+
+volumes:
+  dev-db-data:
+  dev-redis-data:
