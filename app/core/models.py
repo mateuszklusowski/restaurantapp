@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.text import slugify
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -41,3 +42,71 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+
+
+class Cuisine(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name.capitalize()
+
+
+class Restaurant(models.Model):
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, blank=True)
+    city = models.CharField(max_length=255)
+    address = models.CharField(max_length=255)
+    post_code = models.CharField(max_length=7)
+    phone = models.CharField(max_length=17)
+    cuisine = models.ForeignKey(Cuisine, on_delete=models.CASCADE)
+    delivery_price = models.DecimalField(max_digits=5, decimal_places=2)
+
+    def __str__(self):
+        return self.name.capitalize()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+class Tag(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name.capitalize()
+
+
+class Ingredient(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name.capitalize()
+
+
+class Meal(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    description = models.CharField(max_length=255)
+    ingredients = models.ManyToManyField(Ingredient)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name.capitalize()
+
+
+class Drink(models.Model):
+    name = models.CharField(max_length=255)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name.capitalize()
+
+
+class Menu(models.Model):
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    meals = models.ManyToManyField(Meal)
+    drinks = models.ManyToManyField(Drink)
+
+    def __str__(self):
+        return f'{self.restaurant.name} menu'
