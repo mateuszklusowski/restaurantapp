@@ -16,7 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from core.views import health_check
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/restaurants/', include('restaurant.urls')),
+    path('api/user/', include('user.urls')),
+    path('api/auth/', include('drf_social_oauth2.urls', namespace='drf')),
+    path('api/health/', health_check, name='health-check'),
 ]
