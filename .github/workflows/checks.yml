@@ -21,6 +21,8 @@ jobs:
         run: |
           printf ${{env.SECRETS}} >> app/.env
       - name: Test
-        run: docker-compose --env-file app/.env run --rm app sh -c "python3 manage.py wait_for_db && python3 manage.py test"
+        run: |
+         docker-compose --env-file app/.env up -d && 
+         docker-compose --env-file app/.env run --rm app sh -c "python3 manage.py wait_for_db && python3 manage.py test"
       - name: Lint
         run: docker-compose --env-file app/.env run --rm app sh -c "flake8"
