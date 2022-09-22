@@ -29,6 +29,8 @@ ALLOWED_HOSTS = [] if DEBUG else os.environ.get('ALLOWED_HOSTS').split()
 
 AUTH_USER_MODEL = 'core.User'
 
+PASSWORD_RESET_TIMEOUT = 3600
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -69,6 +71,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '1/day',
+    },
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
     ],
@@ -172,6 +177,21 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Email settings
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+if DEBUG:
+    EMAIL_HOST=os.environ.get('TEST_EMAIL_HOST')
+    EMAIL_HOST_USER=os.environ.get('TEST_EMAIL_USER')
+    EMAIL_HOST_PASSWORD=os.environ.get('TEST_EMAIL_PASSWORD')
+    EMAIL_PORT=os.environ.get('TEST_EMAIL_PORT')
+else:
+    EMAIL_HOST = os.environ.get('EMAIL_HOST', 'none')
+    EMAIL_HOST_USER = os.environ.get('EMAIL_USER', 'none')
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD', 'none')
+    EMAIL_PORT = os.environ.get('EMAIL_PORT', 'none')
 
 # Celery settings
 

@@ -1,8 +1,13 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
+from rest_framework.exceptions import Throttled
 
 from .serializers import (UserSerializer,
-                          UserPasswordChangeSerializer)
+                          UserPasswordChangeSerializer,
+                          PasswordResetRequestSerializer)
+
+from django.contrib.auth.views import PasswordResetConfirmView
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -36,3 +41,36 @@ class UserPasswordChangeView(generics.UpdateAPIView):
                 status=status.HTTP_200_OK
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PasswordResetRequestView(generics.GenericAPIView):
+    serializer_class = PasswordResetRequestSerializer
+    permission_classes = (permissions.AllowAny,)
+    throttle_classes = [AnonRateThrottle]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+
+            if not self.throttle_classes:
+                self.throttle_classes.append(AnonRateThrottle)
+
+            return Response(
+                {'success': 'We have sent you an email with \
+                 instructions for resetting your password.'},
+                status=status.HTTP_200_OK
+            )
+        else:
+            self.throttle_classes.clear()
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST)
+
+    def throttled(self, request, wait):
+        raise Throttled(detail={
+            "message": "You can reset your password only once a day."})
+
+
+class PasswordResetConfirmView(PasswordResetConfirmView):
+    pass
