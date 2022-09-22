@@ -22,6 +22,8 @@ services:
       - DEBUG=${DEBUG}
       - CACHE_LOCATION=${CACHE_LOCATION}
       - SECRET_KEY=${SECRET_KEY}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
     depends_on:
       - db
 
@@ -42,6 +44,29 @@ services:
       - dev-redis-data:/data
     depends_on:
       - db
+  
+  celery:
+    build:
+      context: .
+      args:
+        - DEV=True
+    command: >
+      sh -c "celery -A app worker --beat --scheduler django --loglevel=info"
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DEBUG=${DEBUG}
+      - CACHE_LOCATION=${CACHE_LOCATION}
+      - SECRET_KEY=${SECRET_KEY}
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
+      - CELERY_RESULT_BACKEND=${CELERY_RESULT_BACKEND}
+    volumes:
+       - ./app:/app
+    depends_on:
+      - redis
+      - app
 
 volumes:
   dev-db-data:
