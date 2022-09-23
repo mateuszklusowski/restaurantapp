@@ -31,6 +31,8 @@ AUTH_USER_MODEL = 'core.User'
 
 PASSWORD_RESET_TIMEOUT = 3600
 
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,7 +50,8 @@ INSTALLED_APPS = [
     'core',
     'restaurant',
     'user',
-    'orders'
+    'orders',
+    'crispy_forms',
 ]
 
 AUTHENTICATION_BACKENDS = (

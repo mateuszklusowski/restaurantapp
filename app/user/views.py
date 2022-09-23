@@ -8,6 +8,8 @@ from .serializers import (UserSerializer,
                           PasswordResetRequestSerializer)
 
 from django.contrib.auth.views import PasswordResetConfirmView
+from django.urls import reverse_lazy
+from django.contrib.messages.views import SuccessMessageMixin
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -72,5 +74,7 @@ class PasswordResetRequestView(generics.GenericAPIView):
             "message": "You can reset your password only once a day."})
 
 
-class PasswordResetConfirmView(PasswordResetConfirmView):
-    pass
+class PasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
+    template_name = 'user/password_reset_confirm.html'
+    success_url = reverse_lazy('main-page')
+    success_message = 'Password changed successfuly'
