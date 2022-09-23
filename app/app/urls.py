@@ -29,4 +29,7 @@ urlpatterns = [
     path('docs/',
          TemplateView.as_view(template_name='docs/redoc.html'),
          name='docs'),
+    path('',
+         TemplateView.as_view(template_name='main.html'),
+         name='main-page'),
 ]

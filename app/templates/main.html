@@ -1,0 +1,50 @@
+{% extends "index.html" %}
+
+{% block content %}
+<div class="container">
+    <h3>
+        <small>About project</small>
+    </h3>
+    <p class="lead">
+        The project is a small copy of takeaway. It mainly focuses on showing the experience of building api.<br>
+        The project allows us to order food from a restaurant of our choice and see the orders already created.<br>
+        All restaurants are imaginated, also orders created are not real.<br>
+        I didn't do a demo because I'm not familiar with front-end and a frameworks like react.<br>
+        Here is an <a href="{% url 'docs' %}" target="_blank">API documentation</a>.<br>
+        If there is something I should correct, let me know about it.
+    </p>
+    <h3>
+        <small>Counting delivery time</small>
+    </h3>
+    <p class="lead">
+        One idea was to count the delivery time based on the restaurant address and the order address.<br>
+        When creating the order, the server communicated with <a href="https://distancematrix.ai/" target="_blank">Distancematrix.ai</a>'s Matrix API   <br> 
+        where restaurant addresses as well as orders were sent, and delivery times were taken.<br>
+        I gave up on the idea because they are an unnecessary cost for me and the trial versions end after a month.<br>
+        The code that was supposed to be used for this is <a href="https://github.com/mateuszklusowski/restaurantapp/tree/main/counting_time_code" target="_blank">here</a>.
+    </p>
+    <h3>
+        <small>Source Code</small>
+    </h3>
+    <p class="lead">
+        The source code of the project can be found in this repository - <a href="https://github.com/mateuszklusowski/restaurantapp" target="_blank">restaurant project</a>
+    </p>
+    <h3>
+        <small>Libraries and technologies used in project</small>
+    </h3>
+    <ul class="list-group list-group-flush col-3">
+        <li class="list-group-item" style="border-top: none;">Django</li>
+        <li class="list-group-item">djangorestframework</li>
+        <li class="list-group-item">django-crispy-forms</li>
+        <li class="list-group-item">social-auth-app-django</li>
+        <li class="list-group-item">django-oauth-toolkit</li>
+        <li class="list-group-item">drf_social_oauth2</li>
+        <li class="list-group-item">PostgresSQL</li>
+        <li class="list-group-item">psycopg2</li>
+        <li class="list-group-item">celery</li>
+        <li class="list-group-item">redis</li>
+        <li class="list-group-item">httpx</li>
+      </ul>
+
+</div>
+{% endblock content %}
