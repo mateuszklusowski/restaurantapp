@@ -24,4 +24,5 @@ urlpatterns = [
     path('api/user/', include('user.urls')),
     path('api/auth/', include('drf_social_oauth2.urls', namespace='drf')),
     path('api/health/', health_check, name='health-check'),
+    path('api/orders/', include('orders.urls')),
 ]

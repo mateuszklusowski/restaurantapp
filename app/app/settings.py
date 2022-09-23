@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'core',
     'restaurant',
     'user',
+    'orders'
 ]
 
 AUTHENTICATION_BACKENDS = (
