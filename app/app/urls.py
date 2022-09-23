@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
 
 from core.views import health_check
 
@@ -25,4 +26,7 @@ urlpatterns = [
     path('api/auth/', include('drf_social_oauth2.urls', namespace='drf')),
     path('api/health/', health_check, name='health-check'),
     path('api/orders/', include('orders.urls')),
+     path('docs/',
+         TemplateView.as_view(template_name='docs/redoc.html'),
+         name='docs'),
 ]

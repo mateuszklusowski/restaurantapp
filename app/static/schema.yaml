@@ -1,0 +1,556 @@
+openapi: 3.0.2
+info:
+  title: Restaurant API Documentation
+  version: 1.0.0
+  description: |
+    # Authentication and Settings
+    API Settings:
+    - Paraser: JSON
+    - Renderer: JSON
+
+    Orders are only available within Warsaw, so make sure your address is located in Warsaw.
+    
+    Project offers one form of authentication:
+      - OAuth2 Bearer, available to generate on home page.
+
+    <SecurityDefinitions />
+  contact:
+    name: Mateusz Kłusowski
+    email: klusowskimat@gmail.com
+tags:
+  - name: Restaurant
+    description: Here you can see the available restaurants and view their menus. API key not needed.
+  - name: Order
+    description: Here you can create orders and manage them. For use you need an API key
+  - name: User
+    description: Operations about user. For use you need an api key (except creating user)
+paths:
+  /api/restaurants/:
+    get:
+      operationId: Restaurants list
+      description: |
+        Get list of available restaurants. You can sort them with city or cuisine param, for example:
+
+          **.../api/restaurants/?cuisine=cuisine_name&city=city_name**
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Restaurant'
+      tags:
+      - Restaurant
+  /api/restaurants/{slug}/:
+    get:
+      operationId: Retrieve Restaurant
+      description: 'Choose restaurant and see what is on their menu'
+      parameters:
+      - name: slug
+        in: path
+        required: true
+        description: ''
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestaurantDetail'
+          description: ''
+      tags:
+      - Restaurant
+  /api/user/me/:
+    get:
+      operationId: Retrieve User
+      description: Get user details view
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+      security:
+         - Bearer: []
+      tags:
+      - User
+  /api/orders/:
+    get:
+      operationId: Orders list
+      description: Retrieve orders list for authenticated user.
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+          description: ''
+      security:
+         - Bearer: []
+      tags:
+      - Order
+  /api/orders/{id}/:
+    get:
+      operationId: Retrieve Order
+      description: Manage specific order
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this order.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDetail'
+          description: ''
+      security:
+         - Bearer: []
+      tags:
+      - Order
+  /api/user/create/:
+    post:
+      operationId: Create User
+      description: Create a new user in the system
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+      tags:
+      - User
+  /api/orders/create/:
+    post:
+      operationId: Create Order
+      description: Order create endpoint
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderCreate'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderCreate'
+          description: ''
+      security:
+         - Bearer: []
+      tags:
+      - Order
+  /api/user/reset-password/:
+    post:
+      operationId: Password Reset Request
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PasswordResetDone'
+          description: ''
+      tags:
+      - User
+  /api/user/change-password/:
+    put:
+      operationId: User Password Update
+      description: Change user password endpoint
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPasswordUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserPasswordUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserPasswordUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPasswordUpdateDone'
+          description: ''
+      security:
+         - Bearer: []
+      tags:
+      - User
+    patch:
+      operationId: User Password Update
+      description: Change user password view
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPasswordUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserPasswordUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserPasswordUpdate'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPasswordUpdateDone'
+          description: ''
+      security:
+         - Bearer: []
+      tags:
+      - User
+components:
+  schemas:
+    Restaurant:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        slug:
+          type: string
+          maxLength: 255
+          pattern: ^[-a-zA-Z0-9_]+$
+        name:
+          type: string
+          maxLength: 255
+        cuisine:
+          type: string
+          readOnly: true
+        city:
+          type: string
+          maxLength: 255
+        address:
+          type: string
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 255
+        delivery_price:
+          type: string
+          format: decimal
+          multipleOf: 0.01
+          maximum: 1000
+          minimum: -1000
+        avg_delivery_time:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - name
+      - city
+      - address
+      - phone
+      - delivery_price
+      - avg_delivery_time
+    RestaurantDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 255
+        address:
+          type: string
+          maxLength: 255
+        post_code:
+          type: string
+          maxLength: 7
+        phone:
+          type: string
+          maxLength: 255
+        cuisine:
+          type: string
+          readOnly: true
+        menu:
+          type: string
+          readOnly: true
+        delivery_price:
+          type: string
+          format: decimal
+          multipleOf: 0.01
+          maximum: 1000
+          minimum: -1000
+        avg_delivery_time:
+          type: integer
+          maximum: 32767
+          minimum: 0
+      required:
+      - name
+      - city
+      - country
+      - address
+      - post_code
+      - phone
+      - delivery_price
+      - avg_delivery_time
+    User:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+          minLength: 5
+        name:
+          type: string
+          nullable: true
+          maxLength: 255
+      required:
+      - email
+      - password
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        total_price:
+          type: string
+          format: decimal
+          multipleOf: 0.01
+          maximum: 1000
+          minimum: -1000
+          default: 0.0
+        restaurant:
+          type: string
+          readOnly: true
+        delivery_address:
+          type: string
+          maxLength: 255
+        delivery_city:
+          type: string
+          maxLength: 255
+        delivery_phone:
+          type: string
+          maxLength: 255
+        order_time:
+          type: string
+          format: date-time
+      required:
+      - delivery_address
+      - delivery_city
+      - delivery_phone
+      - order_time
+    OrderDetail:
+      type: object
+      properties:
+        total_price:
+          type: string
+          format: decimal
+          multipleOf: 0.01
+          maximum: 1000
+          minimum: -1000
+          default: 0.0
+        restaurant:
+          type: string
+          readOnly: true
+        meals:
+          type: string
+          readOnly: true
+        drinks:
+          type: string
+          readOnly: true
+        delivery_address:
+          type: string
+          maxLength: 255
+        delivery_city:
+          type: string
+          maxLength: 255
+        delivery_phone:
+          type: string
+          maxLength: 255
+        order_time:
+          type: string
+          format: date-time
+      required:
+      - delivery_address
+      - delivery_city
+      - delivery_phone
+      - order_time
+    PasswordResetRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    PasswordResetDone:
+      type: object
+      properties:
+        success:
+          type: string
+          default: 'We have sent you an email with instructions for resetting your password.'
+    OrderCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        restaurant:
+          type: integer
+        meals:
+          type: array
+          items:
+            type: object
+            properties:
+              meal:
+                type: integer
+              quantity:
+                type: integer
+                maximum: 2147483647
+                minimum: 0
+              price:
+                type: string
+                format: decimal
+                multipleOf: 0.01
+                maximum: 1000
+                minimum: -1000
+                readOnly: true
+              total_price:
+                type: string
+                format: decimal
+                multipleOf: 0.01
+                maximum: 1000
+                minimum: -1000
+                readOnly: true
+            required:
+            - meal
+          writeOnly: true
+        drinks:
+          type: array
+          items:
+            type: object
+            properties:
+              drink:
+                type: integer
+              quantity:
+                type: integer
+                maximum: 2147483647
+                minimum: 0
+              price:
+                type: string
+                format: decimal
+                multipleOf: 0.01
+                maximum: 1000
+                minimum: -1000
+                readOnly: true
+              total_price:
+                type: string
+                format: decimal
+                multipleOf: 0.01
+                maximum: 1000
+                minimum: -1000
+                readOnly: true
+            required:
+            - drink
+          writeOnly: true
+        delivery_city:
+          type: string
+          maxLength: 255
+        delivery_address:
+          type: string
+          maxLength: 255
+        delivery_post_code:
+          type: string
+          maxLength: 7
+        delivery_phone:
+          type: string
+          maxLength: 255
+        total_price:
+          type: string
+          format: decimal
+          multipleOf: 0.01
+          maximum: 1000
+          minimum: -1000
+          readOnly: true
+        order_time:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - restaurant
+      - meals
+      - drinks
+      - delivery_city
+      - delivery_address
+      - delivery_country
+      - delivery_post_code
+      - delivery_phone
+    UserPasswordUpdate:
+      type: object
+      properties:
+        old_password:
+          type: string
+        new_password:
+          type: string
+      required:
+      - old_password
+      - new_password
+    UserPasswordUpdateDone:
+      type: object
+      properties:
+        message:
+          type: string
+          default: 'Password changed successfully'
+  securitySchemes:
+    Bearer:
+      description: >
+        Use the api key `Bearer` to the
+        authenticated endpoints. Example: `Authorization: Bearer <your key>`
+      type: apiKey
+      name: Authorization
+      in: header
