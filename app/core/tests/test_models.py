@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from core import models
 
@@ -30,6 +31,10 @@ def sample_meal(**params):
 
 def sample_drink(**params):
     return models.Drink.objects.create(**params)
+
+
+def sample_order(**params):
+    return models.Order.objects.create(**params)
 
 
 class ModelTests(TestCase):
@@ -183,3 +188,136 @@ class ModelTests(TestCase):
 
         for drink in drinks:
             self.assertIn(drink, menu.drinks.all())
+
+    def test_order_model(self):
+        user_params = {
+            'email': 'test@test.com',
+            'name': 'test',
+            'password': 'testpassword'
+        }
+        user = sample_user(**user_params)
+
+        restaurant_params = {
+            'name': 'testname',
+            'city': 'Warsaw',
+            'address': 'testaddress',
+            'post_code': '01-111',
+            'phone': 'testphone',
+            'cuisine': sample_cuisine('testcuisine'),
+            'delivery_price': 7.50
+        }
+        restaurant = sample_restaurant(**restaurant_params)
+
+        order_params = {
+            'user': user,
+            'restaurant': restaurant,
+            'delivery_address': 'test address',
+            'delivery_city': 'Warsaw',
+            'delivery_post_code': '00-000',
+            'delivery_phone': '00000000000',
+            'order_time': timezone.now()
+        }
+
+        order = sample_order(**order_params)
+
+        for key in order_params.keys():
+            if key == 'order_time':
+                continue
+            self.assertEqual(order_params[key], getattr(order, key))
+
+        self.assertEqual(order.order_time.day,
+                         order_params['order_time'].day)
+        self.assertEqual(order.order_time.hour,
+                         order_params['order_time'].hour)
+        self.assertEqual(order.order_time.minute,
+                         order_params['order_time'].minute)
+
+    def test_ordermeal_model(self):
+        user_params = {
+            'email': 'test@test.com',
+            'name': 'test',
+            'password': 'testpassword'
+        }
+        user = sample_user(**user_params)
+
+        restaurant_params = {
+            'name': 'testname',
+            'city': 'Warsaw',
+            'address': 'testaddress',
+            'post_code': '01-111',
+            'phone': 'testphone',
+            'cuisine': sample_cuisine('testcuisine'),
+            'delivery_price': 7.50
+        }
+        restaurant = sample_restaurant(**restaurant_params)
+
+        order_params = {
+            'user': user,
+            'restaurant': restaurant,
+            'delivery_address': 'test address',
+            'delivery_city': 'Warsaw',
+            'delivery_post_code': '00-000',
+            'delivery_phone': '00000000000',
+            'order_time': timezone.now()
+        }
+
+        order = sample_order(**order_params)
+
+        meal = sample_meal(name='testmeal', price=1.00, tag=sample_tag('tag'))
+        order_meal = models.OrderMeal.objects.create(
+            order=order,
+            meal=meal,
+            quantity=2
+        )
+
+        self.assertEqual(order_meal.order, order)
+        self.assertEqual(order_meal.meal, meal)
+        self.assertEqual(order_meal.quantity, 2)
+        self.assertEqual(order_meal.get_total_meal_price, 2)
+
+    def test_orderdrink_model(self):
+        user_params = {
+            'email': 'test@test.com',
+            'name': 'test',
+            'password': 'testpassword'
+        }
+        user = sample_user(**user_params)
+
+        restaurant_params = {
+            'name': 'testname',
+            'city': 'Warsaw',
+            'address': 'testaddress',
+            'post_code': '01-111',
+            'phone': 'testphone',
+            'cuisine': sample_cuisine('testcuisine'),
+            'delivery_price': 7.50
+        }
+        restaurant = sample_restaurant(**restaurant_params)
+
+        order_params = {
+            'user': user,
+            'restaurant': restaurant,
+            'delivery_address': 'test address',
+            'delivery_city': 'Warsaw',
+            'delivery_post_code': '00-000',
+            'delivery_phone': '00000000000',
+            'order_time': timezone.now()
+        }
+
+        order = sample_order(**order_params)
+
+        drink = sample_drink(
+            name='testdrink',
+            price=1.00,
+            tag=sample_tag('tag'))
+
+        order_drink = models.OrderDrink.objects.create(
+            order=order,
+            drink=drink,
+            quantity=2
+        )
+
+        self.assertEqual(order_drink.order, order)
+        self.assertEqual(order_drink.drink, drink)
+        self.assertEqual(order_drink.quantity, 2)
+        self.assertEqual(order_drink.get_total_drink_price, 2)

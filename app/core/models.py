@@ -6,6 +6,8 @@ from django.contrib.auth.models import (
     PermissionsMixin
 )
 
+from decimal import Decimal
+
 
 class UserManager(BaseUserManager):
     """Modify creating a new user or superuser"""
@@ -110,3 +112,51 @@ class Menu(models.Model):
 
     def __str__(self):
         return f'{self.restaurant.name} menu'
+
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    restaurant = models.ForeignKey(Restaurant, on_delete=models.CASCADE)
+    delivery_address = models.CharField(max_length=255, blank=False)
+    delivery_city = models.CharField(max_length=255, blank=False)
+    delivery_post_code = models.CharField(max_length=6, blank=False)
+    delivery_phone = models.CharField(max_length=17, blank=False)
+    order_time = models.DateTimeField(auto_now_add=True)
+    total_price = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=(Decimal(0))
+    )
+
+    def __str__(self):
+        return f'Order {self.user}-{self.id} from {self.restaurant}'
+
+    def save(self, *args, **kwargs):
+        self.total_price += Decimal(self.restaurant.delivery_price)
+        super().save(*args, **kwargs)
+
+
+class OrderDrink(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    drink = models.ForeignKey(Drink, on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField(default=1)
+
+    @property
+    def get_total_drink_price(self):
+        return Decimal(self.drink.price * self.quantity)
+
+    def __str__(self):
+        return f'Order-{self.order.id}, drink-{self.drink.id}'
+
+
+class OrderMeal(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    meal = models.ForeignKey(Meal, on_delete=models.CASCADE)
+    quantity = models.PositiveSmallIntegerField(default=1)
+
+    @property
+    def get_total_meal_price(self):
+        return Decimal(self.meal.price * self.quantity)
+
+    def __str__(self):
+        return f'Order-{self.order.id}, drink-{self.meal.id}'
