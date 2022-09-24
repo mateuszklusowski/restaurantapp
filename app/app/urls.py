@@ -44,4 +44,7 @@ urlpatterns = [
     path('refresh-token/',
          RefreshTokenFormView.as_view(),
          name='token-refresh'),
+    path('reset-password/',
+         TemplateView.as_view(template_name='user/reset_password.html'),
+         name='password-reset'),
 ]
