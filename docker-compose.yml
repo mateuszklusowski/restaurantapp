@@ -27,7 +27,7 @@ services:
       - TEST_EMAIL_HOST=${TEST_EMAIL_HOST}
       - TEST_EMAIL_PASSWORD=${TEST_EMAIL_PASSWORD}
       - TEST_EMAIL_PORT=${TEST_EMAIL_PORT}
-      - TEST_EMAIL_USER=${TEST_EMAIL_USER} 
+      - TEST_EMAIL_USER=${TEST_EMAIL_USER}
     depends_on:
       - db
 
@@ -70,6 +70,9 @@ services:
       - TEST_EMAIL_PASSWORD=${TEST_EMAIL_PASSWORD}
       - TEST_EMAIL_PORT=${TEST_EMAIL_PORT}
       - TEST_EMAIL_USER=${TEST_EMAIL_USER} 
+      - GRANT_TYPE1=${GRANT_TYPE1}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
     volumes:
        - ./app:/app
     depends_on:

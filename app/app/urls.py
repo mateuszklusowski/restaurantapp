@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 
 from core.views import health_check
+from user.views import (BearerTokenFormView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -32,4 +33,7 @@ urlpatterns = [
     path('',
          TemplateView.as_view(template_name='main.html'),
          name='main-page'),
+    path('generate-token/',
+         BearerTokenFormView.as_view(),
+         name='token-generate'),
 ]

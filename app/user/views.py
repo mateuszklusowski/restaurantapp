@@ -10,6 +10,13 @@ from .serializers import (UserSerializer,
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import render
+from django.views.generic.edit import FormView
+from django.contrib.sites.shortcuts import get_current_site
+
+from .forms import (BearerTokenForm)
+
+from .tasks import generate_token
 
 
 class CreateUserView(generics.CreateAPIView):
@@ -78,3 +85,28 @@ class PasswordResetConfirmView(SuccessMessageMixin, PasswordResetConfirmView):
     template_name = 'user/password_reset_confirm.html'
     success_url = reverse_lazy('main-page')
     success_message = 'Password changed successfuly'
+
+
+class BearerTokenFormView(FormView):
+    template_name = 'user/bearer_token.html'
+    form_class = BearerTokenForm
+
+    def form_valid(self, form):
+        host = get_current_site(self.request).domain
+        result = generate_token.delay(
+            domain=host,
+            username=form.cleaned_data['email'],
+            password=form.cleaned_data['password'])
+        data = result.get()
+
+        try:
+            access_token = data['access_token']
+            refresh_token = data['refresh_token']
+            return render(self.request,
+                          'user/bearer_token.html',
+                          {"access_token": access_token,
+                           "refresh_token": refresh_token})
+        except KeyError:
+            return render(self.request,
+                          'user/bearer_token.html',
+                          {"key_error": data})

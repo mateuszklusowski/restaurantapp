@@ -42,7 +42,7 @@
                     <a class="nav-link disabled" href="{% url 'docs' %}" target="_blank">API Docs</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link disabled" href="addTokenGenRoute">Bearer Token</a>
+                    <a class="nav-link disabled" href="{% url 'token-generate' %}">Bearer Token</a>
                 </li>
             </ul>
             {% if messages %}
