@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div id="formContainer">
+    <h3 class="mb-5 text-center">Create user</h1>
+    <form id="generateTokenForm" method="POST">
+        <div class="form-group">
+            {% csrf_token %}
+            {{ form | crispy }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg mt-3">Create user!</button>
+    </form>
+</div>
+{% endblock content %}

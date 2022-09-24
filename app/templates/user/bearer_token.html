@@ -24,6 +24,7 @@
                 {{ form | crispy }}
             </div>
             <button type="submit" class="btn btn-primary btn-lg mt-3">Generate Bearer Token</button>
+            <a href="{% url 'create-user' %}" id="emailHelp" class="form-text mt-4">Don't have an account?</a>
         </form>
     </div>
     {% endif %}

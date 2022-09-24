@@ -13,8 +13,10 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render
 from django.views.generic.edit import FormView
 from django.contrib.sites.shortcuts import get_current_site
+from django.contrib.auth import get_user_model
 
-from .forms import (BearerTokenForm)
+from .forms import (BearerTokenForm,
+                    UserCreateForm)
 
 from .tasks import generate_token
 
@@ -110,3 +112,14 @@ class BearerTokenFormView(FormView):
             return render(self.request,
                           'user/bearer_token.html',
                           {"key_error": data})
+
+
+class UserCreateFormView(SuccessMessageMixin, FormView):
+    template_name = 'user/create_user.html'
+    form_class = UserCreateForm
+    success_message = 'User created!'
+    success_url = reverse_lazy('main-page')
+
+    def form_valid(self, form):
+        get_user_model().objects.create_user(**form.cleaned_data)
+        return super().form_valid(form)

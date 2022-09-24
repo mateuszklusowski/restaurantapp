@@ -26,3 +26,23 @@ class BearerTokenForm(forms.Form):
         if not user.first().check_password(password):
             msg = _('Wrong credentials')
             raise forms.ValidationError(msg)
+
+
+class UserCreateForm(forms.ModelForm):
+
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={'placeholder': 'Enter email'})
+    )
+    password = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(attrs={'placeholder': 'Enter password'})
+    )
+    name = forms.CharField(
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Enter username'})
+    )
+
+    class Meta:
+        model = get_user_model()
+        fields = ('email', 'name', 'password')

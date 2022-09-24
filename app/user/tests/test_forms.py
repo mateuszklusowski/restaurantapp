@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
-from user.forms import (BearerTokenForm)
+from user.forms import (BearerTokenForm,
+                        UserCreateForm)
 
 
 class FormsTests(TestCase):
@@ -21,6 +22,14 @@ class FormsTests(TestCase):
 
         self.assertTrue(bearer_form.is_valid())
 
+        user_form = UserCreateForm(data={
+            'email': 'test@test2.com',
+            'name': 'testname2',
+            'password': 'testpsss'
+        })
+
+        self.assertTrue(user_form.is_valid())
+
     def test_forms_with_incorrect_credentails(self):
         bearer_form = BearerTokenForm(data={
             'email': 'test@test.com',
@@ -28,3 +37,11 @@ class FormsTests(TestCase):
         })
 
         self.assertFalse(bearer_form.is_valid())
+
+        user_form = UserCreateForm(data={
+            'email': 'test@test.com',
+            'name': 'testname',
+            'password': 'testpassword'
+        })
+
+        self.assertFalse(user_form.is_valid())
