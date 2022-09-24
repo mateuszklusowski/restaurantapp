@@ -1,3 +1,5 @@
+import os
+
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
@@ -16,7 +18,8 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.contrib.auth import get_user_model
 
 from .forms import (BearerTokenForm,
-                    UserCreateForm)
+                    UserCreateForm,
+                    RefreshTokenForm)
 
 from .tasks import generate_token
 
@@ -123,3 +126,28 @@ class UserCreateFormView(SuccessMessageMixin, FormView):
     def form_valid(self, form):
         get_user_model().objects.create_user(**form.cleaned_data)
         return super().form_valid(form)
+
+
+class RefreshTokenFormView(FormView):
+    template_name = 'user/refresh_token.html'
+    form_class = RefreshTokenForm
+
+    def form_valid(self, form):
+        host = get_current_site(self.request).domain
+        result = generate_token.delay(
+            domain=host,
+            refresh_token=form.cleaned_data['refresh_token'],
+            grant_type=os.environ.get('GRANT_TYPE2'))
+        data = result.get()
+
+        try:
+            access_token = data['access_token']
+            refresh_token = data['refresh_token']
+            return render(self.request,
+                          'user/bearer_token.html',
+                          {"access_token": access_token,
+                           "refresh_token": refresh_token})
+        except KeyError:
+            return render(self.request,
+                          'user/bearer_token.html',
+                          {"key_error": data})

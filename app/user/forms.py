@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from oauth2_provider.models import get_refresh_token_model
+
 
 class BearerTokenForm(forms.Form):
     email = forms.EmailField(
@@ -46,3 +48,23 @@ class UserCreateForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
         fields = ('email', 'name', 'password')
+
+
+class RefreshTokenForm(forms.Form):
+    refresh_token = forms.CharField(
+        required=True,
+        widget=forms.PasswordInput(
+            attrs={'placeholder': 'Enter refresh token'})
+    )
+
+    def clean_refresh_token(self):
+        refresh_token = self.cleaned_data['refresh_token']
+
+        token_exists = get_refresh_token_model().objects\
+            .filter(token=refresh_token).exists()
+
+        if not token_exists:
+            msg = _('Wrong credentials')
+            raise forms.ValidationError(msg)
+
+        return refresh_token

@@ -2,7 +2,10 @@ from django.test import TestCase
 from django.contrib.auth import get_user_model
 
 from user.forms import (BearerTokenForm,
-                        UserCreateForm)
+                        UserCreateForm,
+                        RefreshTokenForm)
+
+from oauth2_provider.models import get_refresh_token_model, Application
 
 
 class FormsTests(TestCase):
@@ -30,6 +33,25 @@ class FormsTests(TestCase):
 
         self.assertTrue(user_form.is_valid())
 
+        app = Application.objects.create(
+            client_type=Application.CLIENT_CONFIDENTIAL,
+            authorization_grant_type=Application.GRANT_PASSWORD,
+            name='dummy',
+            user=self.user
+        )
+
+        refresh_token = get_refresh_token_model().objects.create(
+            user=self.user,
+            token='secret-refresh-token-key',
+            application=app
+        )
+
+        refresh_form = RefreshTokenForm(data={
+            'refresh_token': refresh_token.token
+        })
+
+        self.assertTrue(refresh_form.is_valid())
+
     def test_forms_with_incorrect_credentails(self):
         bearer_form = BearerTokenForm(data={
             'email': 'test@test.com',
@@ -45,3 +67,9 @@ class FormsTests(TestCase):
         })
 
         self.assertFalse(user_form.is_valid())
+
+        refresh_form = RefreshTokenForm(data={
+            'refresh_token': 'valid-refresh-token'
+        })
+
+        self.assertFalse(refresh_form.is_valid())

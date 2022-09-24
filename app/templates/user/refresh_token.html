@@ -1,0 +1,43 @@
+{% extends "index.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+{% if key_error %}
+    <h3>{{ key_error }}</h3>
+{% endif %}
+{% if access_token %}
+<h2>Access Token</h2>
+<h3 id="access_token" style="cursor: grabbing" onclick="copyToken('access_token')">{{ access_token }}
+    <small class="text-muted" id="copyaccess_token"> - your token will expired in one day (click to copy)</small>
+</h3>
+<h2 class="mt-3">Refresh Token</h2>
+<h3 id="refresh_token" style="cursor: grabbing" onclick="copyToken('refresh_token')">{{ refresh_token }}
+    <small class="text-muted" id="copyrefresh_token"> - here is your refresh token for refreshing access_token(click to copy)</small>
+</h3>
+{% endif %}
+{% if form %}
+<div id="formContainer">
+    <h3 class="mb-5 text-center">Refresh token</h1>
+    <form id="generateTokenForm" method="POST">
+        <div class="form-group">
+            {% csrf_token %}
+            {{ form | crispy }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg mt-3">Refresh Token</button>
+        <a href="{% url 'create-user' %}" id="emailHelp" class="form-text mt-4">Don't have an account?</a>
+        <hr>
+        <a href="{% url 'token-generate' %}" id="emailHelp" class="form-text mt-4">Generate token!</a>
+    </form>
+</div>
+{% endif %}
+{% endblock content %}
+{% block script %}
+<script>
+    function copyToken(value){
+    const text = (document.getElementById(value).textContent.slice(0,30));
+    navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('copy'+value).innerText = '(copied)'
+    });
+    }
+</script>
+{% endblock script %}

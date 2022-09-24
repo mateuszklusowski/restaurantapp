@@ -28,6 +28,7 @@ services:
       - TEST_EMAIL_PASSWORD=${TEST_EMAIL_PASSWORD}
       - TEST_EMAIL_PORT=${TEST_EMAIL_PORT}
       - TEST_EMAIL_USER=${TEST_EMAIL_USER}
+      - GRANT_TYPE2=${GRANT_TYPE2}
     depends_on:
       - db
 

@@ -19,7 +19,8 @@ from django.views.generic import TemplateView
 
 from core.views import health_check
 from user.views import (BearerTokenFormView,
-                        UserCreateFormView)
+                        UserCreateFormView,
+                        RefreshTokenFormView)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -40,4 +41,7 @@ urlpatterns = [
     path('create-user/',
          UserCreateFormView.as_view(),
          name='create-user'),
+    path('refresh-token/',
+         RefreshTokenFormView.as_view(),
+         name='token-refresh'),
 ]
