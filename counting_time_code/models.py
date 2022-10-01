@@ -11,6 +11,7 @@ class Order(models.Model):
         max_digits=5,
         decimal_places=2,
         default=Decimal(0))
+    average_delivery_time = models.CharField(max_length=5, blank=True)
 
     def __str__(self):
         return f'Order: {self.user}-{self.id} from {self.restaurant}'

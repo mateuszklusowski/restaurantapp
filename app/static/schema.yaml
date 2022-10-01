@@ -275,17 +275,12 @@ components:
           multipleOf: 0.01
           maximum: 1000
           minimum: -1000
-        avg_delivery_time:
-          type: integer
-          maximum: 32767
-          minimum: 0
       required:
       - name
       - city
       - address
       - phone
       - delivery_price
-      - avg_delivery_time
     RestaurantDetail:
       type: object
       properties:
@@ -319,10 +314,6 @@ components:
           multipleOf: 0.01
           maximum: 1000
           minimum: -1000
-        avg_delivery_time:
-          type: integer
-          maximum: 32767
-          minimum: 0
       required:
       - name
       - city
@@ -331,7 +322,6 @@ components:
       - post_code
       - phone
       - delivery_price
-      - avg_delivery_time
     User:
       type: object
       properties:
