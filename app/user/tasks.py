@@ -10,8 +10,6 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.urls import reverse
 
-from oauth2_provider.models import clear_expired
-
 
 @shared_task
 def send_reset_password_email(email_subject, email_body, to_whom):
@@ -25,7 +23,8 @@ def send_reset_password_email(email_subject, email_body, to_whom):
 
 @shared_task
 def clear_expired_tokens():
-    return clear_expired()
+    from oauth2_provider.models import clear_expired
+    clear_expired()
 
 
 @shared_task

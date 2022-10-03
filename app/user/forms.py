@@ -2,7 +2,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-from oauth2_provider.models import get_refresh_token_model
+from oauth2_provider.models import (get_refresh_token_model,
+                                    get_access_token_model)
 
 
 class BearerTokenForm(forms.Form):
@@ -27,6 +28,10 @@ class BearerTokenForm(forms.Form):
 
         if not user.first().check_password(password):
             msg = _('Wrong credentials')
+            raise forms.ValidationError(msg)
+
+        if get_access_token_model().objects.filter(user=user[0]).first():
+            msg = _('Access token is still avalible')
             raise forms.ValidationError(msg)
 
 
@@ -60,11 +65,15 @@ class RefreshTokenForm(forms.Form):
     def clean_refresh_token(self):
         refresh_token = self.cleaned_data['refresh_token']
 
-        token_exists = get_refresh_token_model().objects\
-            .filter(token=refresh_token).exists()
+        token = get_refresh_token_model().objects\
+            .filter(token=refresh_token)
 
-        if not token_exists:
+        if not token.exists():
             msg = _('Wrong credentials')
+            raise forms.ValidationError(msg)
+
+        if token.first().access_token is None:
+            msg = _('Wrong refresh token')
             raise forms.ValidationError(msg)
 
         return refresh_token
