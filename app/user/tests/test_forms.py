@@ -1,11 +1,16 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from django.utils import timezone
+
+import datetime
 
 from user.forms import (BearerTokenForm,
                         UserCreateForm,
                         RefreshTokenForm)
 
-from oauth2_provider.models import get_refresh_token_model, Application
+from oauth2_provider.models import (get_refresh_token_model,
+                                    Application,
+                                    get_access_token_model)
 
 
 class FormsTests(TestCase):
@@ -39,10 +44,15 @@ class FormsTests(TestCase):
             name='dummy',
             user=self.user
         )
-
         refresh_token = get_refresh_token_model().objects.create(
             user=self.user,
             token='secret-refresh-token-key',
+            access_token=get_access_token_model().objects.create(
+                    user=self.user,
+                    token='secret-access-token-key',
+                    application=app,
+                    expires=timezone.now() + datetime.timedelta(days=1)
+                ),
             application=app
         )
 
@@ -53,6 +63,27 @@ class FormsTests(TestCase):
         self.assertTrue(refresh_form.is_valid())
 
     def test_forms_with_incorrect_credentails(self):
+        app = Application.objects.create(
+            client_type=Application.CLIENT_CONFIDENTIAL,
+            authorization_grant_type=Application.GRANT_PASSWORD,
+            name='dummy',
+            user=self.user
+        )
+
+        get_access_token_model().objects.create(
+                    user=self.user,
+                    token='secret-access-token-key',
+                    application=app,
+                    expires=timezone.now() + datetime.timedelta(days=1)
+                )
+
+        bearer_form = BearerTokenForm(data={
+            'email': 'test@test.com',
+            'password': 'testpassword'
+        })
+
+        self.assertFalse(bearer_form.is_valid())
+
         bearer_form = BearerTokenForm(data={
             'email': 'test@test.com',
             'password': 'testpass'
