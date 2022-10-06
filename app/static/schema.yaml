@@ -31,7 +31,7 @@ paths:
       description: |
         Get list of available restaurants. You can sort them with city or cuisine param, for example:
 
-          **.../api/restaurants/?cuisine=cuisine_name&city=city_name**
+          **.../api/restaurants/?cuisine=cuisine_name**
       parameters: []
       responses:
         '200':

@@ -91,27 +91,3 @@ class RestaurantAPITests(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertIn(serial1, res.data)
         self.assertNotIn(serial2, res.data)
-
-    def test_search_with_city(self):
-        params = {
-            'name': 'testname',
-            'city': 'Warsaw',
-            'address': 'testaddress',
-            'post_code': '01-111',
-            'phone': 'testphone',
-            'cuisine': sample_cuisine('testcuisine'),
-            'delivery_price': 7.50
-        }
-        rest1 = sample_restaurant(**params)
-        params['name'] = 'testname2'
-        params['city'] = 'Poznan'
-        rest2 = sample_restaurant(**params)
-
-        res = self.client.get(RESTAURANTS_URL, {'city': 'warsaw'})
-
-        serial1 = RestaurantSerializer(rest1).data
-        serial2 = RestaurantSerializer(rest2).data
-
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertIn(serial1, res.data)
-        self.assertNotIn(serial2, res.data)

@@ -17,10 +17,6 @@ class RestaurantViewSet(viewsets.GenericViewSet,
         """Params filtering"""
         queryset = self.queryset
         cuisine = str(self.request.query_params.get('cuisine', '')).lower()
-        city = str(self.request.query_params.get('city', '')).title()
-
-        if city != '':
-            queryset = queryset.filter(city=city)
 
         if cuisine != '':
             queryset = queryset.filter(cuisine__name=cuisine)
