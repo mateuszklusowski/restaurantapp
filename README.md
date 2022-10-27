@@ -1,3 +1,5 @@
+#The project is temporarily shut down
+
 # About project
 A self-implemented project that is a small copy of a Takeaway. It mainly focuses on showing the experience of an building api.
 The project allows us to order food from a restaurant of our choice and see the orders that are already created.
