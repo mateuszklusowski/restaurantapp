@@ -26,7 +26,9 @@ PostgresSQL\
 psycopg2\
 celery\
 redis\
-httpx
+httpx\
+nginx\
+uwsgi
 ## Documentation
 
 [Documentation](https://restaurantapp.mateuszk.site/docs)
