@@ -1,4 +1,4 @@
-#The project is temporarily shut down
+# The project is temporarily shut down
 
 # About project
 A self-implemented project that is a small copy of a Takeaway. It mainly focuses on showing the experience of an building api.
